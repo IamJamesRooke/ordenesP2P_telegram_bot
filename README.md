@@ -1,20 +1,133 @@
 # OrdenesP2P Telegram Bot
 
-A personal Telegram bot that monitors the OrdenesP2P group and forwards filtered messages to your DM with clean formatting.
+A smart Telegram bot that monitors the OrdenesP2P group and finds your ideal Bitcoin trading counterparties with professional formatting.
+
+**⚠️ CONFIGURE FIRST:** This bot is pre-configured for selling Bitcoin. If you're buying or want different rates, see the **Configuration** section below!
 
 ## What It Does
 
-- 🔍 **Monitors** the OrdenesP2P Telegram group 24/7
-- 🎯 **Filters** for #BUYCOP messages only  
-- 📱 **Forwards** to your personal DM via bot
-- ✨ **Formats** messages to show only: Amount, Rate, and Link
+- 🔍 **Monitors** the OrdenesP2P Telegram group 24/7 using your personal account
+- 🎯 **Smart Filtering:** Finds counterparties for YOUR trades:
+  - `#BUYCOP` messages = **Buyers** (good if you're selling)
+  - `#SELLCOP` messages = **Sellers** (good if you're buying)
+  - `Tasa: yadio.io` (specific exchange rate provider)
+  - **Inverted rate logic** - finds good rates for YOUR side of the trade
+- 📱 **Instant Alerts** via your personal bot to your DM
+- ✨ **Professional Formatting** with clickable links that open directly in Telegram
 
-**Example Output:**
+**Example Alert:**
 ```
-20.000 - 100.000 COP 🇨🇴
-Tasa: yadio.io -1%
-Link: https://t.me/c/-1001696822031/19126
+*Buyer Found:* 20.000 - 100.000 COP 🇨🇴
+*Rate:* yadio.io -1%
+————————————
+� View Offer
 ```
+
+**Smart Rate Logic:**
+- **#BUYCOP (buyers):** Finds rates close to market (good for you as seller)
+- **#SELLCOP (sellers):** Finds rates close to market (good for you as buyer)
+
+**Key Features:**
+- **Finds counterparties** - buyers when you're selling, sellers when you're buying
+- **Smart rate filtering** - automatically inverts logic for buy vs sell orders
+- Clickable links open directly in Telegram app
+- Clean, readable formatting with bold text
+- **Configurable filtering** via `config.json` file (no code editing needed!)
+
+---
+
+## ⚙️ Configuration
+
+The bot uses a `config.json` file for easy customization without editing code.
+
+**🚨 IMPORTANT: Configure for YOUR trading strategy before running!**
+
+### **Quick Start - Choose Your Strategy:**
+
+#### **Strategy 1: You're SELLING Bitcoin (looking for buyers)**
+```json
+{
+  "filters": {
+    "hashtags": ["#BUYCOP"],
+    "rate_thresholds": {
+      "yadio.io": {
+        "#BUYCOP": {
+          "min_percentage": -1.0,
+          "max_percentage": null
+        }
+      }
+    }
+  }
+}
+```
+*This finds buyers offering -1% or better (no upper limit - higher premiums welcomed!)*
+
+#### **Strategy 2: You're BUYING Bitcoin (looking for sellers)**
+```json
+{
+  "filters": {
+    "hashtags": ["#SELLCOP"],
+    "rate_thresholds": {
+      "yadio.io": {
+        "#SELLCOP": {
+          "min_percentage": null,
+          "max_percentage": 1.0
+        }
+      }
+    }
+  }
+}
+```
+*This finds sellers offering +1% or better (no lower limit - bigger discounts welcomed!)*
+
+#### **Strategy 3: Both buying and selling**
+```json
+{
+  "filters": {
+    "hashtags": ["#BUYCOP", "#SELLCOP"],
+    "rate_thresholds": {
+      "yadio.io": {
+        "#BUYCOP": {
+          "min_percentage": -1.0,
+          "max_percentage": null
+        },
+        "#SELLCOP": {
+          "min_percentage": null,
+          "max_percentage": 1.0
+        }
+      }
+    }
+  }
+}
+```
+
+### **How to Configure:**
+1. **Edit `config.json`** in the project root
+2. **Copy one of the strategies above** (or see [CONFIG.md](CONFIG.md) for more options)
+3. **Restart the bot** to apply changes
+
+**📋 Need help?**
+- **[CONFIG.md](CONFIG.md)** - Complete configuration guide with examples
+- **[CONFIG_TEMPLATES.md](CONFIG_TEMPLATES.md)** - Ready-to-copy configuration templates
+
+---
+
+## 🔧 How It Works
+
+### Advanced Filtering Logic:
+1. **Monitors** OrdenesP2P group in real-time using your personal Telegram account
+2. **First Filter:** Only processes messages containing `#BUYCOP`
+3. **Second Filter:** Only processes messages with `Tasa: yadio.io` rate lines
+4. **Third Filter:** Extracts percentage from rate (e.g., "yadio.io -1%")
+5. **Rate Validation:** Only forwards offers between -1% to +1% of market price
+6. **Message Formatting:** Extracts amount, formats with Markdown, creates clickable link
+7. **Bot Delivery:** Sends via your personal bot to your DM
+
+### Technical Architecture:
+- **Telethon:** Reads messages from group using your personal account
+- **Regex Parsing:** Extracts rates and percentages from message text
+- **HTTP Bot API:** Sends formatted alerts via your dedicated bot
+- **Markdown Formatting:** Bold text and clickable links for better UX
 
 ---
 
@@ -168,6 +281,18 @@ pip3 install telethon python-dotenv httpx
 - Make sure you're a member of OrdenesP2P group
 - Check your phone has good internet connection
 - Verify bot token and chat ID are correct
+- Ensure your account can see messages in the group
+
+### Only getting a few alerts per day
+- This is expected! The bot has strict filtering (±1% rates only)
+- Most P2P offers have higher premiums (2-5%+)
+- The bot only forwards the best deals
+- You can check console output to see filtered messages
+
+### Links not opening in Telegram app
+- Make sure you're clicking the link from within Telegram
+- Links use t.me format which should open in-app
+- If opening in browser, copy link and paste in Telegram
 
 ### iPhone bot stops working
 - Check Background App Refresh is enabled
@@ -189,10 +314,20 @@ pip3 install telethon python-dotenv httpx
 ## 🛠️ Technical Details
 
 - **Language:** Python 3
-- **Libraries:** Telethon (Telegram client), httpx (HTTP requests), python-dotenv (environment variables)
-- **Architecture:** Personal account monitors group → Bot forwards filtered messages
-- **Filtering:** Only #BUYCOP hashtag messages
-- **Formatting:** Extracts amount, rate, and link only
+- **Dependencies:** 
+  - `telethon==1.36.0` (Telegram client API)
+  - `python-dotenv==1.0.1` (environment variable loading)
+  - `httpx==0.27.0` (async HTTP client for bot API)
+- **Architecture:** Personal account monitors group → Advanced filtering → Bot forwards alerts
+- **Configuration:** JSON-based filtering system (no code editing required)
+- **Filtering Capabilities:** 
+  - Multiple hashtags (`#BUYCOP`, `#SELLCOP`)
+  - Multiple rate providers (`yadio.io`, `binance.com`, etc.)
+  - Configurable rate thresholds per provider
+  - Customizable message formatting
+- **Message Format:** Markdown with bold text and clickable t.me links
+- **Storage:** Stateless - configuration loaded on startup, no data persistence
+- **Performance:** Lightweight - only processes matching messages
 
 ---
 

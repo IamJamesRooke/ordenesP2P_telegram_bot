@@ -13,6 +13,9 @@ __pycache__/
 *.session
 *.session-journal
 
+# Backup files
+*_backup.py
+
 # IDE/Editor files
 .vscode/
 .idea/

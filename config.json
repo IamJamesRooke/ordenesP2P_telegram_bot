@@ -1,0 +1,21 @@
+{
+  "filters": {
+    "hashtags": ["#BUYCOP"],
+    "rate_providers": ["yadio.io"],
+    "rate_thresholds": {
+      "yadio.io": {
+        "#BUYCOP": {
+          "min_percentage": -1.0,
+          "max_percentage": null
+        }
+      }
+    }
+  },
+  "formatting": {
+    "buy_prefix": "*Buyer Found:*",
+    "sell_prefix": "*Seller Found:*",
+    "rate_prefix": "*Rate:*",
+    "separator": "————————————",
+    "link_text": "📱 View Offer"
+  }
+}
