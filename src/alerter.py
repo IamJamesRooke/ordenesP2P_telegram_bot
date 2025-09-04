@@ -18,6 +18,10 @@ class Alerter:
         url = f"{os.getenv('TELEGRAM_API_URL', 'https://api.telegram.org')}/bot{self.bot_token}/sendMessage"
         async with httpx.AsyncClient(timeout=int(os.getenv('HTTP_TIMEOUT', '10'))) as client:
             try:
-                await client.post(url, json={"chat_id": self.chat_id, "text": text})
+                await client.post(url, json={
+                    "chat_id": self.chat_id, 
+                    "text": text, 
+                    "parse_mode": "Markdown"
+                })
             except Exception as e:
                 print(f"{os.getenv('ERROR_PREFIX', 'Failed to send alert via bot')}: {e}. Falling back to console.\n{text}")
