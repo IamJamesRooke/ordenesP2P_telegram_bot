@@ -1,0 +1,24 @@
+# Environment variables (sensitive info)
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+*.log
+
+# Telegram session files (contains auth tokens)
+*.session
+*.session-journal
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
