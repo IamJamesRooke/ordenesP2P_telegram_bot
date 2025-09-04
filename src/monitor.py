@@ -63,12 +63,23 @@ async def main():
                 amount_line = line.replace("Por ", "")
         
         # Build the formatted message
-        url = f"https://t.me/c/{event.chat_id}/{event.message.id}" if event.chat_id and event.message.id else ""
+        # Use t.me format that opens in Telegram app
+        if event.chat_id and event.message.id:
+            # Convert chat_id to proper format for t.me links
+            chat_id_str = str(event.chat_id)
+            if chat_id_str.startswith('-100'):
+                # Remove -100 prefix for supergroup links
+                clean_chat_id = chat_id_str[4:]
+                url = f"https://t.me/c/{clean_chat_id}/{event.message.id}"
+            else:
+                url = f"https://t.me/c/{event.chat_id}/{event.message.id}"
+        else:
+            url = "No link available"
         
         # Extract rate part from tasa_line (e.g., "yadio.io -3%" from "Tasa: yadio.io -3%")
         rate_part = tasa_line.replace("Tasa: ", "")
         
-        formatted_message = f"*Buy Offer:* {amount_line}\n*Rate:* {rate_part}\n*Link:* {url}"
+        formatted_message = f"*Buy Offer:* {amount_line}\n*Rate:* {rate_part}\n[📱 View Original Message]({url})"
         
         await alerter.send(formatted_message)
 
