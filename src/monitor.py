@@ -79,7 +79,7 @@ async def main():
         # Extract rate part from tasa_line (e.g., "yadio.io -3%" from "Tasa: yadio.io -3%")
         rate_part = tasa_line.replace("Tasa: ", "")
         
-        formatted_message = f"*Buy Offer:* {amount_line}\n*Rate:* {rate_part}\n[📱 View Original Message]({url})"
+        formatted_message = f"*Buy Offer:* {amount_line}\n*Rate:* {rate_part}\n————————————\n[� View Offer]({url})"
         
         await alerter.send(formatted_message)
 
